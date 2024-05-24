@@ -92,8 +92,7 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
   }
 
   Future<void>  agregarElementoFt (idElemento/*,fotografia*/) async {
-
-      
+      //se agregara cosas nuevas
   }
 
   Future<void> agregarCarro() async {
