@@ -18,6 +18,7 @@ class _FichaVehicularState extends State<FichaVehicular> {
   TextEditingController idAnio = TextEditingController();
   TextEditingController idColor = TextEditingController();
   TextEditingController idNoMotor = TextEditingController();
+  int bandera = 0;
 
   /*==============================FUNCIONES UTILIZADAS==============================*/
 String? validateAnio(String? value) {
@@ -54,6 +55,8 @@ String? validateAnio(String? value) {
       prefs.setString('anio', idAnio.text);
       prefs.setString('color', idColor.text);
       prefs.setString('noMotor', idNoMotor.text);
+      prefs.setInt('InspProcess', bandera);
+      
   }
     /*=========================FUN DE FUNCIONES UTILIZADAS==========================*/
 
@@ -67,6 +70,7 @@ String? validateAnio(String? value) {
         leading: IconButton(
           onPressed: (){
             print("back");
+            Navigator.pop(context);
           },
           icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
@@ -145,11 +149,14 @@ String? validateAnio(String? value) {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       // Los campos son válidos, puedes continuar
+                      bandera = 1;
+                      print("FICHA -> ELEMENTOS");
                       print(idMarca.text);
                       print(idModelo.text);
                       print(idAnio.text);
                       print(idColor.text);
                       print(idNoMotor.text);
+                      print(bandera);
                       guardadoFicha();
                       Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const ElementosVehiculo()));
                     }
