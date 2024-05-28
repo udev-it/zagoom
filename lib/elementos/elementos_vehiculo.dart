@@ -20,9 +20,12 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
   String _noMotor = '';
   int _processInsp = 0;
   final List<Icon> _iconoActual = [const Icon(Icons.minimize), const Icon(Icons.minimize), const Icon(Icons.minimize), const Icon(Icons.minimize), const Icon(Icons.minimize), const Icon(Icons.minimize), const Icon(Icons.minimize),const Icon(Icons.minimize), const Icon(Icons.minimize)];
+  final List<Icon> _iconoActualCm = [const Icon(Icons.camera_alt), const Icon(Icons.camera_alt), const Icon(Icons.camera_alt), const Icon(Icons.camera_alt), const Icon(Icons.camera_alt), const Icon(Icons.camera_alt), const Icon(Icons.camera_alt),const Icon(Icons.camera_alt), const Icon(Icons.camera_alt)];
+  final List<bool> _ableCamara = [true, true, true,true, true, true,true, true, true];
   int _idAutoF = 0;
-  List<int> ideElementos = [];
-  final bool _botonDeshabilitado = false;
+  List<int> ideElementos = []; 
+  List<String> ftElementos = []; //CHECAR SI PUEDE SEGUIR SIENDO STRING - ULTIMA REVISION: 27/05/2024
+  bool _botonDeshabilitado = false;
   int _contFts = 0;
 
 /*==============================FUNCIONES UTILIZADAS==============================*/
@@ -37,11 +40,10 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
 
   Future<void> ordenEjecucion() async {
     await recuperadoFicha();
-    await agregarCarro(); 
-    await backupElements();
+    await _cargaBackupVehuculo();
   }
 
-//FUNCION PARA LA RECUPERACION DE LOS DATOS DE LA FICHA TECNICA DEL VEHICULO
+//FUNCION PARA LA RECUPERACION DE LOS DATOS DE LA FICHA TECNICA DEL VEHICULO (SHARED_PREFERENCES -> RECUPERACION DE DATOS)
   Future<void> recuperadoFicha () async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -51,63 +53,116 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
       _color = prefs.getString('color') ?? '';
       _noMotor = prefs.getString('noMotor') ?? '';
       _processInsp = prefs.getInt('InspProcess') ?? 0;
+      _contFts = prefs.getInt('contFts') ?? 0;
     });
-    print("SIIIII");
+    print("SE RECUPERARON LOS DATOS DEL CARRO");
     print(_processInsp);
+    print("SIGUIENTE FUNCION");
   }
 
-  Future<void> guardadoFicha () async {
+//FUNCION PARALA RECUPERACION DE LA ID DE LOS ELEMENTOS (SHARED_PREFERENCES)
+  Future<List<int>> cargarIdsElemento() async {
+    final prefs = await SharedPreferences.getInstance();
+    final elementosGuardados = prefs.getStringList('elementos') ?? [];
+
+    final idsElemento = elementosGuardados.map((elementoString) {
+      final partes = elementoString.split('|');
+      return int.parse(partes[0]);
+    }).toList();
+
+    return idsElemento;
+  }
+
+//FUNCION PARA LA RECUPERACION DE LA FOTOGRAFIA DE LOS ELEMENTOS (SHARED_PREFERENCES) %%% CHECAR  VARIABLE DE RECUPERACION
+  Future<List<String>> cargarFotografia() async {
+    final prefs = await SharedPreferences.getInstance();
+    final elementosGuardados = prefs.getStringList('elementos') ?? [];
+
+    final fotografia = elementosGuardados.map((elementoString) {
+      final partes = elementoString.split('|');
+      return partes[1];
+    }).toList();
+
+    return fotografia;
+  }
+
+//FUNCION PARA LA CARGA DEL BACKUP RECUPERADO DE LAS DEMAS FUNCIONES
+  Future<void> _cargaBackupVehuculo () async {
+      print('LLEGAMOS A LA FUNCION DE RECUPERAR ELEMENTOS');
+      ideElementos = await cargarIdsElemento();
+      ftElementos = await cargarFotografia();
+
+      if (ideElementos.isNotEmpty) {
+        print("entre 1.1  SP");
+        for(int i = 0; i < 9; i++){
+          int indice = ideElementos.indexWhere((element) => element == i);
+          if(indice != -1){
+            print("entre 1.1.1 SP");
+            _iconoActual[i] = const Icon(Icons.check);
+            _ableCamara[i] = false;
+            _iconoActualCm[i] = const Icon(Icons.camera_alt, color: Colors.grey);
+          }
+        }
+        if(_contFts == 9){
+          _botonDeshabilitado = true;
+        }
+      }
+  }
+
+//FUNCION PARA TOMAR LA FOTOGRAFIA (CON LA DEPENDENCIA DE CAMARA)
+  Future<void>  agregarElementoFt (idElemento/*,fotografia*/) async {
+      
+  }
+
+//FUNCION PARA CAMBIAR EL ICONO CUANDO ESTE DEBE SER ACTUALIZADO UNA VEZ LA CAMARA TOMO LA FOTO Y FUE GUARDADA
+  void _funtIconChange(int idElementoActual) {
+    _iconoActual[idElementoActual] = const Icon(Icons.check);
+    _iconoActualCm[idElementoActual] = const Icon(Icons.camera_alt, color: Colors.grey);
+    _ableCamara[idElementoActual] = false;
+    setState(() {
+       
+    });
+  }
+
+//GUARDAR EL CONTADOR DE LOS ELEMENTOS GUARDADOS (SHARED_PREFERENCES)
+  Future<void> guardadoElementCont () async {
       final prefs = await SharedPreferences.getInstance();
       prefs.setInt('contFts', _contFts); 
   }
 
-//FUNCION PARA RECUPERAR LA INFORMACION DE LOS ELEMENTOS PREGUARDADOS
-  Future<void> backupElements () async {
-    if(_processInsp == 1){
-      print("SE CUMPLEEEE");
-      final conexion = await MySqlConnection.connect(ConnectionSettings(
-        host: 'bdzgm.c9wmgukmkflh.us-east-2.rds.amazonaws.com',
-        port: 3306,
-        user: 'admin',
-        password: '123456789',
-        db: 'BDZAGOOM',
-      ));
-      Results autoBup = await conexion.query('SELECT idAuto,marca,modelo FROM auto ORDER BY idAuto DESC LIMIT 1');
-        if (autoBup.isNotEmpty) {
-          print("entre 1");
-          // Obtiene el valor del idAuto de la primera fila
-          var row = autoBup.first;
-          _idAutoF = row['idAuto'];
-          _marca = row['marca'];
-          _modelo = row['modelo'];
-          Results results = await conexion.query(
-            '''SELECT idElemento FROM auto, imagen
-            WHERE auto.idAuto = ? AND auto.idAuto = imagen.idAuto''',
-            [_idAutoF]
-          );
-          if (results.isNotEmpty) {
-            print("entre 1.1");
-            for (var row in results) {
-              ideElementos.add(row['idElemento']);
-            }
-            for(int i = 1; i <= 9; i++){
-              int indice = ideElementos.indexWhere((element) => element == i);
-              if(indice != -1){
-                print("entre 1.1.1");
-                _iconoActual[i-1] = const Icon(Icons.check);
-              }
-            }
-          }
-        }
-      conexion.close();
-    }
-    setState(() {
-        
-    });
+//FUNCION PARA GUARDAR LOS ELEMENTOS CAPTURADOS DE MANERA PROVISIONAL (SHARED_PREFERENCES)
+  Future<void> _guardadoElementosSP (int idElemento,/*,fotografia*/) async {
+
+    String foto = 'esto sera una cadena de foto';
+    final elementoString = '$idElemento|$foto'; // Combina los valores
+    print('LLEGAMOS A GUARDAR ID ELEMENTOS');
+    final prefs = await SharedPreferences.getInstance();
+    final elementosGuardados = prefs.getStringList('elementos') ?? [];
+    print('LLEGAMOS A CREAR LA INSTANCIA ELEMENTOS');
+    elementosGuardados.add(elementoString);
+    await prefs.setStringList('elementos', elementosGuardados);
+    print('LLEGAMOS A GUARDAR LA INSTANCIA ELEMENTOS');
   }
+
+//FUNCIONALIDAD COMPLETA DE LA CAMARA PARA TOMAR LA FOTO Y GUARDARLA (SHARED_PREFERENCES)
+  void  _miFuncionDeCamara (int idElemento){
+    //SIGUIENTE SPRINT: FUNCION PARA TOMAR LA FOTOGRAFIA Y RECUPERARLA
+    print('LLEGUE A LA FUNCIONALIDAD DE LA CAMARA');
+    _guardadoElementosSP(idElemento/*,fotografia*/);
+    _funtIconChange(idElemento);
+    _contFts++;
+    print('contador de camaras');
+    print(_contFts);
+    guardadoElementCont();
+    if(_contFts == 9){
+      _botonDeshabilitado = true;
+    }
+  }
+
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCIONES RELACIONADAS CON LA BASE DE DATOS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-//FUNCION PARA AGREGAR LOS ELEMENTOS DEL VEHICULO A  LA BASE DE DATOS
-  Future<void> agregarElementoBD(int idElemento/*,fotografia*/) async {
+//FUNCION PARA AGREGAR LOS ELEMENTOS DEL VEHICULO A  LA BASE DE DATOS  (FUNCION DE BASE DE DATOS)
+  Future<void> agregarElementoBD(List<int> idElemento/*,fotografia*/) async {
     final conexion = await MySqlConnection.connect(ConnectionSettings(
       host: 'bdzgm.c9wmgukmkflh.us-east-2.rds.amazonaws.com',
       port: 3306,
@@ -119,61 +174,65 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
       Results autoBup = await conexion.query('SELECT idAuto FROM auto ORDER BY idAuto DESC LIMIT 1');
        var row = autoBup.first;
         _idAutoF = row['idAuto'];
-      await conexion.query('''
-        INSERT INTO imagen (idAuto, idElemento, estado)  
-        VALUES (?, ?, ?)
-      ''', [_idAutoF,idElemento+1, 1]);
+        for(int i = 0; i < idElemento.length; i++){
+          await conexion.query('''
+            INSERT INTO imagen (idAuto, idElemento, estado)  
+            VALUES (?, ?, ?)
+          ''', [_idAutoF,idElemento[i], 1]);
+          print(idElemento[i]);
+        }
+      
     } catch (e) {
       print('Error al insertar datos: $e');
     }
     conexion.close();
   }
-//FUNCION PARA CAMBIAR EL ICONO CUANDO ESTE DEBE SER ACTUALIZADO UNA VEZ LA CAMARA TOMO LA FOTO Y FUE GUARDADA
-  void _funtIconChange(int idElementoActual) {
-     _iconoActual[idElementoActual] = const Icon(Icons.check);
-     setState(() {
-       
-     });
-  }
 
-  Future<void>  agregarElementoFt (idElemento/*,fotografia*/) async {
-      
-  }
-
+//FUNCION PARA AGREGAR UN NUEVO VEHICULO DESPUES DE LA FICHA VEHICULAR A LA BASE DE DATOS  (FUNCION DE BASE DE DATOS)
   Future<void> agregarCarro() async {
-    if(_processInsp != 1){
-      print("se cumplio :D");
-      final conexion = await MySqlConnection.connect(ConnectionSettings(
-        host: 'bdzgm.c9wmgukmkflh.us-east-2.rds.amazonaws.com',
-        port: 3306,
-        user: 'admin',
-        password: '123456789',
-        db: 'BDZAGOOM',
-      ));
-      try {
-          await conexion.query('''
-            INSERT INTO auto (id_user,no_motor, marca, modelo, color, anio, id_status)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-          ''', [1, _noMotor, _marca, _modelo, _color, _anio, 1]);
-        } catch (e) {
-          print('Error al insertar datos: $e');
-        } finally {
-          await conexion.close();
-      }
-      conexion.close();
+    print("se cumplio :D");
+    final conexion = await MySqlConnection.connect(ConnectionSettings(
+      host: 'bdzgm.c9wmgukmkflh.us-east-2.rds.amazonaws.com',
+      port: 3306,
+      user: 'admin',
+      password: '123456789',
+      db: 'BDZAGOOM',
+    ));
+    try {
+      await conexion.query('''
+        INSERT INTO auto (id_user,no_motor, marca, modelo, color, anio, id_status)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      ''', [1, _noMotor, _marca, _modelo, _color, _anio, 1]);
+    } catch (e) {
+      print('Error al insertar datos: $e');
+    } finally {
+      await conexion.close();
     }
+    conexion.close();
   }
 
-  void  _miFuncionDeCamara (int idElemento){
-    //SIGUIENTE SPRINT: FUNCION PARA TOMAR LA FOTOGRAFIA Y RECUPERARLA
-    agregarElementoBD(idElemento/*,fotografia*/);
-    _funtIconChange(idElemento);
-    _contFts++;
+//FUNCION PARA GUARDAR TODO LO GUARDADO EN SHARED_PREFERENCES A LA BASE DE DATOS
+  Future<void> guardarBD () async {
+    ideElementos = await cargarIdsElemento();
+    ftElementos = await cargarFotografia();
+    setState(() {
+      _botonDeshabilitado  = false ; 
+    });
+    print('LLEGUE A LA FUNCION GUARDAR EN LA DB');
+    await agregarCarro();
+    print('LLEGUE A LA FUNCION AGREGAR CARRO');
+    await agregarElementoBD(ideElementos);
+    print('LLEGUE A LA FUNCION AGREGAR ELEMENTOS');
+    final prefs = await SharedPreferences.getInstance();
+    print('SE CREA LA INSTANCIA SP');
+    await prefs.clear();
+    print('SE CIERRA EL SP');
   }
 
+// %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FIN DE LAS FUNCIONES RELACIONADAS CON LA BASE DE DATOS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
 /*=========================FUN DE FUNCIONES UTILIZADAS==========================*/
-  @override
+  @override    
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -183,19 +242,14 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
         leading: IconButton(
           onPressed: (){
             print("back");
-            if(_processInsp  == 1){
-              print("ELEMENTOS -> INICIO");
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
-            }else{
-              Navigator.pop(context);
-            }
-            print("ELEMENTOS -> INICIO 2");
+            print("ELEMENTOS -> INICIO");
             print(_marca);
             print(_modelo);
             print(_anio);
             print(_color);
             print(_noMotor);
             print(_processInsp);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
             
           },
           icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -261,8 +315,11 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: _botonDeshabilitado ? const Color.fromARGB(255, 255, 106, 106) : Colors.grey,
               ),
-              onPressed: !_botonDeshabilitado ? null : () {
+              onPressed: !_botonDeshabilitado ? null : () async {
                 print('Finalización');
+                await guardarBD ();
+                // ignore: use_build_context_synchronously
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
               },
               child: const Text('Finalizar', style: TextStyle(color: Colors.white)),
             ),
@@ -281,10 +338,10 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: GestureDetector(
-          onTap: (){
+          onTap: !_ableCamara[idElemento] ? null : (){
             _miFuncionDeCamara(idElemento);
            },
-          child: const Icon(Icons.camera_alt),
+          child: _iconoActualCm[idElemento],
         ),
       ),
       Padding(

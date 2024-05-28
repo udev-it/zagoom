@@ -22,6 +22,8 @@ class _HomePageState extends State<HomePage> {
   Future<void> procesoInspeccionBand () async {
     final prefs = await SharedPreferences.getInstance();
     _processInsp = prefs.getInt('InspProcess') ?? 0;
+    print('LLEGAMOS A PROCESO INSP BAND');
+    print(_processInsp);
   }
   @override
   Widget build(BuildContext context) {
@@ -38,13 +40,12 @@ class _HomePageState extends State<HomePage> {
             ),
             onPressed: () {
               if(_processInsp == 1){
-                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const ElementosVehiculo()));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const ElementosVehiculo()));
                 print("INICIO -> ELEMENTOS");
               }else{
                 print("INICIO -> FICHAAA");
-                Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const FichaVehicular()));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const FichaVehicular()));
               }
-              print("INICIO -> ELEMENTOS 2 ");
               print(_processInsp);
             },
             child: const Text('Realizar inspección Vehicular', style: TextStyle(color: Colors.white)),

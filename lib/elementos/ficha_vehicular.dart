@@ -1,4 +1,5 @@
 import 'package:app_zagoom/elementos/elementos_vehiculo.dart';
+import 'package:app_zagoom/elementos/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,8 +56,7 @@ String? validateAnio(String? value) {
       prefs.setString('anio', idAnio.text);
       prefs.setString('color', idColor.text);
       prefs.setString('noMotor', idNoMotor.text);
-      prefs.setInt('InspProcess', bandera);
-      
+      prefs.setInt('InspProcess', bandera); 
   }
     /*=========================FUN DE FUNCIONES UTILIZADAS==========================*/
 
@@ -70,7 +70,7 @@ String? validateAnio(String? value) {
         leading: IconButton(
           onPressed: (){
             print("back");
-            Navigator.pop(context);
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
           },
           icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
@@ -158,7 +158,7 @@ String? validateAnio(String? value) {
                       print(idNoMotor.text);
                       print(bandera);
                       guardadoFicha();
-                      Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const ElementosVehiculo()));
+                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const ElementosVehiculo()));
                     }
                   },
                   child: const Text('Guardar', style: TextStyle(color: Colors.white)),
