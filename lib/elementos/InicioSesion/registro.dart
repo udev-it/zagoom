@@ -85,7 +85,7 @@ class _RegistroState extends State<Registro> {
           leading: IconButton(
             onPressed: () {
               print("back");
-              Navigator.pop(context);
+              Navigator. pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Inicio()));
             },
             icon: const Icon(Icons.arrow_back, color: Colors.white),
           ),

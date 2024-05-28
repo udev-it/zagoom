@@ -59,7 +59,7 @@ class _InicioState extends State<Inicio> {
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Error en la respuesta de la API')),
+            const SnackBar(content: Text('Credenciales incorrectas')),
           );
         }
       }
