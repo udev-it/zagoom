@@ -21,8 +21,7 @@ class _RegistroState extends State<Registro> {
   final RegExp reMedio = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$'); // correo
   final RegExp contra = RegExp(r'^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,}$'); // contraseña
 
-  Future<bool> addUser() async {
-    bool success = false;
+  Future<String?> addUser() async {
     final url = Uri.parse('https://glorious-sparkle-development.up.railway.app/zagoom/user');
 
     final response = await http.post(
@@ -41,13 +40,12 @@ class _RegistroState extends State<Registro> {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      success = true;
+      return null; // Éxito
     } else {
-      print('Error al insertar datos: ${response.body}');
+      return 'Error: Este correo ya fue registrado';
     }
-
-    return success;
   }
+
 
   String? validateRequired(String? value) {
     if (value == null || value.isEmpty) {
@@ -223,16 +221,56 @@ class _RegistroState extends State<Registro> {
                         backgroundColor: const Color.fromARGB(255, 255, 106, 106),
                       ),
                       onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          if (await addUser()) {
-                            // ignore: use_build_context_synchronously
-                            //REDIRIGE A LA PANTALLA DE INICIO DE SESION
-                            //Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const Inicio()));
+                          if (_formKey.currentState!.validate()) {
+                            String? errorMessage = await addUser();
+                            if (errorMessage == null) {
+                              // Éxito, muestra la ventana emergente de confirmación
+                              showDialog(
+                                // ignore: use_build_context_synchronously
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text('Registro Exitoso'),
+                                    content: const Text('El usuario ha sido registrado exitosamente.'),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop(); // Cierra el cuadro diálogo
+                                          // REDIRIGE A LA PANTALLA DE INICIO DE SESION
+                                         // Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                          } else {
+                            // Muestra el error en una ventana emergente
+                            showDialog(
+                              // ignore: use_build_context_synchronously
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Error al registrar usuario'),
+                                  content: Text(errorMessage),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           }
                         }
                       },
                       child: const Text("Registrarse", style: TextStyle(color: Colors.white)),
                     ),
+
                   ],
                 ),
               ],
