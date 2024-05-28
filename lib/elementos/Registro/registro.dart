@@ -237,6 +237,7 @@ class _RegistroState extends State<Registro> {
                                         onPressed: () {
                                           Navigator.of(context).pop(); // Cierra el cuadro diálogo
                                           // REDIRIGE A LA PANTALLA DE INICIO DE SESION
+                                          //Cambiar el nombre de HomePage
                                          // Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
                                         },
                                         child: const Text('OK'),
