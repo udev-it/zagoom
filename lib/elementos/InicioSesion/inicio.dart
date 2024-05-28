@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:app_zagoom/elementos/InicioSesion/paginaprincipal.dart';
+import 'package:app_zagoom/elementos/InicioSesion/registro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:http/http.dart' as http;
@@ -190,7 +191,10 @@ class _InicioState extends State<Inicio> {
               ),
               const SizedBox(height: 25),
               TextButton(
-                onPressed: () {},
+                onPressed: () {
+               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Registro()));
+
+                },
                 child: const Text('No tienes una cuenta? Crea una'),
               ),
             ],

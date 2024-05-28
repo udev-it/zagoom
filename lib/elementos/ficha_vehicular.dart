@@ -1,4 +1,4 @@
-import 'package:app_zagoom/elementos/elementos_vehiculo.dart';
+
 import 'package:flutter/material.dart';
 
 class FichaVehicular extends StatefulWidget {

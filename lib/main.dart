@@ -1,4 +1,5 @@
-import 'package:app_zagoom/elementos/ficha_vehicular.dart';
+import 'package:app_zagoom/elementos/InicioSesion/inicio.dart';
+//import 'package:app_zagoom/elementos/ficha_vehicular.dart';
 import 'package:flutter/material.dart';
 
 void main(){
@@ -12,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FichaVehicular(),
+      home: Inicio(),
     );
   }
 }
