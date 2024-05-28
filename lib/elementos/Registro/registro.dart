@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mysql1/mysql1.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Registro extends StatefulWidget {
   const Registro({super.key});
@@ -17,34 +18,54 @@ class _RegistroState extends State<Registro> {
   final _apePController = TextEditingController();
   final _apeMController = TextEditingController();
   bool _passwordVisible = false;
+  final RegExp reMedio = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$'); // correo
+  final RegExp contra = RegExp(r'^(?=\w*\d)(?=\w*[A-Z])(?=\w*[a-z])\S{8,}$'); // contraseña
 
   Future<bool> addUser() async {
     bool success = false;
-    final conn = await MySqlConnection.connect(ConnectionSettings(
-      host: 'bdzgm.c9wmgukmkflh.us-east-2.rds.amazonaws.com',
-      port: 3306,
-      user: 'admin',
-      password: '123456789',
-      db: 'BDZAGOOM',
-    ));
+    final url = Uri.parse('https://glorious-sparkle-development.up.railway.app/zagoom/user');
 
-    try {
-      await conn.query('''
-          INSERT INTO usuario (nombre, apellidoP, apellidoM, telefono, correo, password)
-          VALUES (?, ?, ?, ?, ?, ?)
-        ''', [_nombreController.text, _apePController.text, _apeMController.text, _telController.text, _correoController.text, _passwController.text, ]);
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'nombre': _nombreController.text,
+        'apellidoPaterno': _apePController.text,
+        'apellidoMaterno': _apeMController.text,
+        'telefono': _telController.text,
+        'correo': _correoController.text,
+        'password': _passwController.text,
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
       success = true;
-    } catch (e) {
-      print('Error al insertar datos: $e');
-    } finally {
-      await conn.close();
+    } else {
+      print('Error al insertar datos: ${response.body}');
     }
+
     return success;
   }
 
   String? validateRequired(String? value) {
     if (value == null || value.isEmpty) {
       return 'Este campo es obligatorio';
+    }
+    return null;
+  }
+
+  String? validateEmail(String? value) {
+    if (!reMedio.hasMatch(value ?? '')) {
+      return 'Ingrese un correo electrónico válido';
+    }
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    if (!contra.hasMatch(value ?? '')) {
+      return 'Debe tener al menos 8 caracteres, una letra mayúscula y un número';
     }
     return null;
   }
@@ -138,7 +159,13 @@ class _RegistroState extends State<Registro> {
                     suffixIcon: Icon(Icons.email_outlined),
                     border: OutlineInputBorder(),
                   ),
-                  validator: validateRequired,
+                  validator: (value) {
+                    String? requiredValidation = validateRequired(value);
+                    if (requiredValidation != null) {
+                      return requiredValidation;
+                    }
+                    return validateEmail(value);
+                  },
                 ),
                 const SizedBox(height: 20),
                 const Text('Contraseña: '),
@@ -152,9 +179,7 @@ class _RegistroState extends State<Registro> {
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _passwordVisible
-                            ? Icons.visibility
-                            : Icons.visibility_off,
+                        _passwordVisible ? Icons.visibility : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -162,8 +187,15 @@ class _RegistroState extends State<Registro> {
                         });
                       },
                     ),
+                     errorMaxLines: 3, // Permitir que el mensaje de error se muestre en múltiples líneas
                   ),
-                  validator: validateRequired,
+                  validator: (value) {
+                    String? requiredValidation = validateRequired(value);
+                    if (requiredValidation != null) {
+                      return requiredValidation;
+                    }
+                    return validatePassword(value);
+                  },
                 ),
                 const SizedBox(height: 20),
                 Row(
@@ -195,7 +227,6 @@ class _RegistroState extends State<Registro> {
                           if (await addUser()) {
                             // ignore: use_build_context_synchronously
                             //REDIRIGE A LA PANTALLA DE INICIO DE SESION
-                            //CHECAR NOMBRE DE PANTALLA
                             //Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) => const Inicio()));
                           }
                         }
