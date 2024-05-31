@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:zagoom/elementos/InicioSesion/paginaprincipal.dart';
 import 'package:zagoom/elementos/InicioSesion/registro.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart'; // AGREGADO 29/05/2024
 

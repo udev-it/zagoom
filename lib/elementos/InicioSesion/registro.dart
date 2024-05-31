@@ -1,5 +1,4 @@
 import 'package:zagoom/elementos/InicioSesion/inicio.dart';
-import 'package:zagoom/elementos/InicioSesion/paginaprincipal.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -23,6 +22,7 @@ class _RegistroState extends State<Registro> {
   final _apePController = TextEditingController();
   final _apeMController = TextEditingController();
   bool _passwordVisible = false;
+  bool _isRegistering = false;
   final RegExp reMedio = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$'); // correo
   final RegExp contra = RegExp(r'^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])\S{8,10}$'); // contraseña (mínimo 8, máximo 10 caracteres)
     int _idUser = 0; //AGREGADO 29/05/2024
@@ -242,11 +242,16 @@ class _RegistroState extends State<Registro> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 255, 106, 106),
                       ),
-                      onPressed: () async {
+                      onPressed: _isRegistering ? null : () async {
                         if (_formKey.currentState!.validate()) {
+                          setState(() {
+                            _isRegistering = true;
+                          });
                           String? errorMessage = await addUser();
+                          setState(() {
+                            _isRegistering = false;
+                          });
                           if (errorMessage == null) {
-                            // Éxito, muestra la ventana emergente de confirmación
                             showDialog(
                               // ignore: use_build_context_synchronously
                               context: context,
@@ -257,8 +262,7 @@ class _RegistroState extends State<Registro> {
                                   actions: <Widget>[
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context).pop(); // Cierra el cuadro diálogo
-                                        // REDIRIGE A LA PANTALLA DE INICIO DE SESION
+                                        Navigator.of(context).pop();
                                         Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Inicio()));
                                       },
                                       child: const Text('OK'),
@@ -268,7 +272,6 @@ class _RegistroState extends State<Registro> {
                               },
                             );
                           } else {
-                            // Muestra el error en una ventana emergente
                             showDialog(
                               // ignore: use_build_context_synchronously
                               context: context,
@@ -291,7 +294,7 @@ class _RegistroState extends State<Registro> {
                         }
                       },
                       child: const Text("Registrarse", style: TextStyle(color: Colors.white)),
-                    ),
+                    )
                   ],
                 ),
               ],
