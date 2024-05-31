@@ -1,7 +1,9 @@
-import 'package:app_zagoom/elementos/elementos_vehiculo.dart';
-import 'package:app_zagoom/elementos/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zagoom/elementos/InicioSesion/paginaprincipal.dart';
+import 'package:zagoom/elementos/elementos_vehiculo.dart';
+
+
 
 class FichaVehicular extends StatefulWidget {
   const FichaVehicular({super.key});
@@ -70,18 +72,18 @@ String? validateAnio(String? value) {
         leading: IconButton(
           onPressed: (){
             print("back");
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const PaginaPrincipal()));
           },
           icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
-        actions: [
+        /*actions: [
           IconButton(
             onPressed: (){
               print("info");
             },
             icon: const Icon(Icons.help_outline, color: Colors.white),
           )
-        ],
+        ],*/
       ),
       body: SingleChildScrollView(
         child: Padding(

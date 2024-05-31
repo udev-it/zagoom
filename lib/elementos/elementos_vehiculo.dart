@@ -1,8 +1,9 @@
 //import 'package:app_zagoom/elementos/home_page.dart';
-import 'package:app_zagoom/elementos/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:zagoom/elementos/InicioSesion/paginaprincipal.dart';
+
 
 class ElementosVehiculo extends StatefulWidget {
   const ElementosVehiculo({super.key});
@@ -27,7 +28,7 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
   List<String> ftElementos = []; //CHECAR SI PUEDE SEGUIR SIENDO STRING - ULTIMA REVISION: 27/05/2024
   bool _botonDeshabilitado = false;
   int _contFts = 0;
-
+  int _idUser = 0; //AGREGADO 29/05/2024
 /*==============================FUNCIONES UTILIZADAS==============================*/
 
   @override
@@ -54,6 +55,7 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
       _noMotor = prefs.getString('noMotor') ?? '';
       _processInsp = prefs.getInt('InspProcess') ?? 0;
       _contFts = prefs.getInt('contFts') ?? 0;
+      _idUser = prefs.getInt('idUser') ?? 0;  //AGREGADO 29/05/2024
     });
     print("SE RECUPERARON LOS DATOS DEL CARRO");
     print(_processInsp);
@@ -202,7 +204,7 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
       await conexion.query('''
         INSERT INTO auto (id_user,no_motor, marca, modelo, color, anio, id_status)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      ''', [1, _noMotor, _marca, _modelo, _color, _anio, 1]);
+      ''', [_idUser, _noMotor, _marca, _modelo, _color, _anio, 1]);
     } catch (e) {
       print('Error al insertar datos: $e');
     } finally {
@@ -249,19 +251,19 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
             print(_color);
             print(_noMotor);
             print(_processInsp);
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const PaginaPrincipal()));
             
           },
           icon: const Icon(Icons.arrow_back, color: Colors.white),
         ),
-        actions: [
+        /*actions: [
           IconButton(
             onPressed: (){
               print("info");
             },
             icon: const Icon(Icons.help_outline, color: Colors.white),
           )
-        ],
+        ],*/
       ),
       body: SingleChildScrollView(
       child:  Column(
@@ -319,7 +321,7 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
                 print('Finalización');
                 await guardarBD ();
                 // ignore: use_build_context_synchronously
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const HomePage()));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const PaginaPrincipal()));
               },
               child: const Text('Finalizar', style: TextStyle(color: Colors.white)),
             ),
