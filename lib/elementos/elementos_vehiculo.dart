@@ -1,8 +1,11 @@
 //import 'package:app_zagoom/elementos/home_page.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:zagoom/elementos/InicioSesion/paginaprincipal.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 class ElementosVehiculo extends StatefulWidget {
@@ -29,6 +32,7 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
   bool _botonDeshabilitado = false;
   int _contFts = 0;
   int _idUser = 0; //AGREGADO 29/05/2024
+  File? imagen; //AGREGADO 05/06/2024
 /*==============================FUNCIONES UTILIZADAS==============================*/
 
   @override
@@ -147,18 +151,36 @@ class _ElementosVehiculoState extends State<ElementosVehiculo> {
   }
 
 //FUNCIONALIDAD COMPLETA DE LA CAMARA PARA TOMAR LA FOTO Y GUARDARLA (SHARED_PREFERENCES)
-  void  _miFuncionDeCamara (int idElemento){
+  Future<void> _miFuncionDeCamara (int idElemento) async{
     //SIGUIENTE SPRINT: FUNCION PARA TOMAR LA FOTOGRAFIA Y RECUPERARLA
     print('LLEGUE A LA FUNCIONALIDAD DE LA CAMARA');
-    _guardadoElementosSP(idElemento/*,fotografia*/);
-    _funtIconChange(idElemento);
-    _contFts++;
-    print('contador de camaras');
-    print(_contFts);
-    guardadoElementCont();
-    if(_contFts == 9){
-      _botonDeshabilitado = true;
-    }
+
+    // INICIO DE LA FUNCIONALIDAD DE LA CAMARA
+    XFile? imgRuta;
+
+    imgRuta = await ImagePicker().pickImage(source: ImageSource.camera);
+    
+    setState(() {
+      if (imgRuta != null) {
+        imagen = File(imgRuta.path);
+
+        _guardadoElementosSP(idElemento/*,fotografia*/);
+        _funtIconChange(idElemento);
+        _contFts++;
+        print('contador de camaras');
+        print(_contFts);
+        guardadoElementCont();
+        if(_contFts == 9){
+          _botonDeshabilitado = true;
+        }
+        
+      } else {
+        imagen = File('');
+      }
+    });
+
+    // FIN DE LA FUNCIONALIDAD DE LA CAMARA
+
   }
 
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCIONES RELACIONADAS CON LA BASE DE DATOS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
