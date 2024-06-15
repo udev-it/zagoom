@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:zagoom/elementos/InicioSesion/paginaprincipal.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:camera/camera.dart';
 
 
 class ElementosVehiculo extends StatefulWidget {

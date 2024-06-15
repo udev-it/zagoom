@@ -1,3 +1,4 @@
+import 'package:zagoom/elementos/InicioSesion/inicio.dart';
 import 'package:zagoom/elementos/elementos_vehiculo.dart';
 import 'package:zagoom/elementos/ficha_vehicular.dart';
 import 'package:flutter/material.dart';
@@ -52,13 +53,13 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-             /* ElevatedButton.icon(
+             ElevatedButton.icon(
                 onPressed: () {
                   // Handle "Consultar Vehiculos" button press
-                },                                                       bonton pendiente 
+                },
                 icon: const Icon(Icons.directions_car),
                 label: const Text('Consultar Vehiculos'),
-              ),*/
+              ),
               const SizedBox(height: 16), // espacio entre los  buttons
               ElevatedButton.icon(
                 onPressed: () {
@@ -75,6 +76,17 @@ class _PaginaPrincipalState extends State<PaginaPrincipal> {
                 },
                 icon: const Icon(Icons.directions_car),
                 label: const Text('Nueva Inspeccion Vehicular'),
+              ),
+              const SizedBox(height: 50),
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.clear();
+                  // ignore: use_build_context_synchronously
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Inicio()));
+                },
+                icon: const Icon(Icons.close_outlined),
+                label: const Text('Cerrar sesión'),
               ),
             ],
           ),
