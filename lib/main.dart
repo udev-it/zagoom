@@ -17,6 +17,13 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   int _idUser = 0;
+
+  @override
+  void initState() {
+      super.initState();      
+      recuperadoFicha ();
+    }
+
   Future<void> recuperadoFicha () async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
