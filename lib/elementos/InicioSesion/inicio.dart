@@ -43,9 +43,6 @@ Future<void> _login() async {
       body: json.encode(data),
     );
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-
     if (response.statusCode == 200) {
       final Map<String, dynamic> userData = json.decode(response.body);
 
@@ -128,7 +125,7 @@ Future<void> _login() async {
                 children: [
                   Center(
                     child: Text(
-                      'Correo',
+                      'Correo:',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                   ),
@@ -153,7 +150,7 @@ Future<void> _login() async {
                 children: [
                   Center(
                     child: Text(
-                      'Contraseña',
+                      'Contraseña:',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                   ),
