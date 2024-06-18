@@ -184,6 +184,7 @@ class _FichaVehicularState extends State<FichaVehicular> {
         prefs.setString('marca', _selectedBrandName!);
         prefs.setString('modelo', _selectedModelName!);
         prefs.setInt('InspProcess', bandera); 
+        prefs.setString('noMotor', idNoMotor.text); 
     }
 
     // AGREGADO 04/06/2024
@@ -210,8 +211,7 @@ class _FichaVehicularState extends State<FichaVehicular> {
                 // ignore: use_build_context_synchronously
                 Navigator.of(context).pop();
                 // ignore: use_build_context_synchronously
-                Navigator.pushReplacement(context,MaterialPageRoute(builder: (BuildContext context) => const ElementosVehiculo()),
-                );
+                Navigator.pushReplacement(context,MaterialPageRoute(builder: (BuildContext context) => const ElementosVehiculo()),);
               },
             ),
           ],
