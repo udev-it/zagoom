@@ -3,7 +3,8 @@ import 'package:zagoom/elementos/InicioSesion/paginaprincipal.dart';
 import 'package:zagoom/elementos/InicioSesion/registro.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart'; // AGREGADO 29/05/2024
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zagoom/elementos/recuperacion/recuperacion.dart'; // AGREGADO 29/05/2024
 
 ////AGREGADO 29/05/2024: SE GUARDA EN SHARED PREFERENCES EL ID DE USUARIO REGISTRADO
 
@@ -171,10 +172,12 @@ Future<void> _login() async {
                 ],
               ),
               const SizedBox(height: 15),
-              /*TextButton(
-                onPressed: () {},
+              TextButton(
+                onPressed: () {
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const RecuperarPantalla()));
+                },
                 child: const Text('¿Olvidaste tu contraseña?'),
-              ),*/
+              ),
               const SizedBox(height: 25),
               ElevatedButton(
                 onPressed: _login,
@@ -204,7 +207,7 @@ Future<void> _login() async {
               //const SizedBox(height: 25),
               TextButton(
                 onPressed: () {
-               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Registro()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Registro()));
 
                 },
                 child: const Text('No tienes una cuenta? Crea una'),
