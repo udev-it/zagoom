@@ -226,7 +226,7 @@ class _FichaVehicularState extends State<FichaVehicular> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text("Ficha vehícular", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: const Text("Ficha vehicular", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
         backgroundColor: const Color.fromARGB(255, 255, 106, 106),
         leading: IconButton(
           onPressed: (){
@@ -297,7 +297,7 @@ class _FichaVehicularState extends State<FichaVehicular> {
                     );
                   }).toList(),
                   decoration: const InputDecoration(
-                    labelText: 'modelo',
+                    labelText: 'Modelo',
                     border: OutlineInputBorder(),
                   ),
                   validator: validateRequiredSelect
