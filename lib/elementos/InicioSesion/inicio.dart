@@ -201,16 +201,15 @@ Future<void> _login() async {
                   SignInButton(
                     Buttons.Facebook,
                     onPressed: () {},
-                  ),
+                  ), 
                 ],
               ),*/
               //const SizedBox(height: 25),
               TextButton(
                 onPressed: () {
                   Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context) => const Registro()));
-
                 },
-                child: const Text('No tienes una cuenta? Crea una'),
+                child: const Text('¿No tienes una cuenta?, Crea una'),
               ),
             ],
           ),
